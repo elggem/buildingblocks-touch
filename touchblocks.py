@@ -111,6 +111,8 @@ class TouchBlocksApp(App):
     title = 'Touch Blocks'
 
     def build(self):
+        Window.bind(on_resize=self.on_resize)
+
         Window.clearcolor = (1, 1, 1, 1)
         # return TouchBlocks()
         # create a default grid layout with custom width/height
@@ -119,8 +121,13 @@ class TouchBlocksApp(App):
         topGridsLayout = GridLayout(cols=2, padding=10, spacing=10)
         bottomGridLayout = GridLayout(cols=6, padding=10, spacing=10)
 
-        topGridSourceLayout = GridLayout(cols=6, rows=6, padding=10, spacing=0)
-        topGridTargetLayout = GridLayout(cols=6, rows=6, padding=10, spacing=0)
+        topGridSourceLayout = GridLayout(cols=6, rows=6, padding=10, spacing=0, size_hint=(None,None))
+        topGridTargetLayout = GridLayout(cols=6, rows=6, padding=10, spacing=0, size_hint=(None,None))
+
+
+        # topGridSourceLayout.width = topGridsLayout.height
+
+        # topGridsLayout.bind(width=Window.setter('width'))
 
         # when we add children to the grid layout, its size doesn't change at
         # all. we need to ensure that the height will be the minimum required
@@ -159,6 +166,12 @@ class TouchBlocksApp(App):
         # root.add_widget(layout)
 
         return mainLayout
+
+
+    def on_resize(self, window, width, height):
+        #self.gridSize = [width, height]
+        print("Fff")
+        return True
 
     def on_pause(self):
         return True
