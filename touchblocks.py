@@ -8,6 +8,7 @@ kivy.require('1.0.6')
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.scrollview import ScrollView
@@ -21,51 +22,34 @@ from kivy.core.window import Window
 from random import random
 from math import sqrt
 
-class TouchBlocks(FloatLayout):
-    def __init__(self):
-        super(TouchBlocks, self).__init__()
+assetPrefix = "assets/png/"
+pathBoxEmpty = assetPrefix+'box_empty.png'
+pathBoxGreen = assetPrefix+'box_green.png'
+pathBoxRed = assetPrefix+'box_red.png'
+pathPyramidOrange = assetPrefix+'pyramid_orange.png'
+pathTriangleBlue = assetPrefix+'triangle_blue.png'
+pathTriangleGreen = assetPrefix+'triangle_green.png'
 
-        # subscribe to window resize event
-        Window.bind(on_resize=self.on_resize)
-        # initialize background color
-        Window.clearcolor = (1, 1, 1, 1)
-        
-        # initialize elements
-        self.elements = [Grid(self.canvas)]
+class TouchableBlock(RelativeLayout):
+    def __init__(self, source=pathBoxEmpty, **kwargs):
+        super(TouchableBlock, self).__init__(**kwargs)
 
-        # draw first frame
-        self.draw()
+        gridImage = Image(source=source)
+        self.add_widget(gridImage)
 
-    def draw(self):
-        with self.canvas:
-            self.canvas.clear()
-
-            for element in self.elements:
-                element.draw()
-                 
-
-    def on_resize(self, window, width, height):
-        #self.gridSize = [width, height]
-        self.draw()
-        return True
+    def displayBlock(self, source):
+        img = Image(source=source)
+        self.add_widget(img)
+        # self.source = source
 
     def on_touch_down(self, touch):
-        with self.canvas:
-            Color(1.0, 0.0, 0.0)
-            Rectangle(pos=(touch.x-5, touch.y-5), size=(10, 10))
+        print("touch")
         return True
 
     def on_touch_move(self, touch):
-        with self.canvas:
-            Color(0.0, 1.0, 0.0)
-            Rectangle(pos=(touch.x, touch.y), size=(2, 2))
+        print("moving")
         return True
 
-    def on_touch_up(self, touch):
-        with self.canvas:
-            Color(0.0, 0.0, 1.0)
-            Rectangle(pos=(touch.x-5, touch.y-5), size=(10, 10))
-        return True
 
 
 class TouchBlocksApp(App):
@@ -78,11 +62,11 @@ class TouchBlocksApp(App):
         Window.clearcolor = (1, 1, 1, 1)
         Window.bind(on_resize=self.on_resize)
 
-
     def on_resize(self, window, width, height):
         self.topGridsLayout.width = Window.width
         self.topGridsLayout.height = Window.height/3*2
-        self.bottomGridLayout.width = Window.height/2
+        self.bottomGridLayout.width = Window.height/2 * 1.5 # bottom buttons scaling factor
+        self.bottomGridLayout.height = Window.height/3
         self.topGridSourceLayout.height = Window.height/2
         self.topGridSourceLayout.width = self.topGridSourceLayout.height
         self.topGridTargetLayout.height = Window.height/2
@@ -93,10 +77,10 @@ class TouchBlocksApp(App):
 
         # return TouchBlocks()
         # create a default grid layout with custom width/height
-        self.mainLayout = GridLayout(cols=1)
+        self.mainLayout = FloatLayout()
 
         self.topGridsLayout = GridLayout(cols=2, size_hint=(None,None))
-        self.bottomGridLayout = GridLayout(cols=6, size_hint=(None,1))
+        self.bottomGridLayout = GridLayout(cols=5, size_hint=(None,None))
 
         self.topGridSourceLayout = GridLayout(cols=6, rows=6, size_hint=(None,None))
         self.topGridTargetLayout = GridLayout(cols=6, rows=6, size_hint=(None,None))
@@ -104,6 +88,7 @@ class TouchBlocksApp(App):
         self.topGridsLayout.width = Window.width
         self.topGridsLayout.height = Window.height/3*2
         self.bottomGridLayout.width = Window.height/2 * 1.5 # bottom buttons scaling factor
+        self.bottomGridLayout.height = Window.height/3
 
         self.topGridSourceLayout.height = Window.height/2
         self.topGridTargetLayout.height = Window.height/2
@@ -112,40 +97,51 @@ class TouchBlocksApp(App):
 
         topGridSourceAnchorLayout = AnchorLayout(anchor_x='center', anchor_y='center')
         topGridTargetAnchorLayout = AnchorLayout(anchor_x='center', anchor_y='center')
-        bottomGridAnchorLayout = AnchorLayout(anchor_x='center', anchor_y='center')
         topGridSourceAnchorLayout.add_widget(self.topGridSourceLayout)
         topGridTargetAnchorLayout.add_widget(self.topGridTargetLayout)
-        bottomGridAnchorLayout.add_widget(self.bottomGridLayout)
         
         self.topGridsLayout.add_widget(topGridSourceAnchorLayout)
         self.topGridsLayout.add_widget(topGridTargetAnchorLayout)
 
-        self.mainLayout.add_widget(self.topGridsLayout)
+        topGridsAnchorLayout = AnchorLayout(anchor_x='center', anchor_y='top')
+        bottomGridAnchorLayout = AnchorLayout(anchor_x='center', anchor_y='bottom')
+        topGridsAnchorLayout.add_widget(self.topGridsLayout)
+        bottomGridAnchorLayout.add_widget(self.bottomGridLayout)
+
+        self.mainLayout.add_widget(topGridsAnchorLayout)
         self.mainLayout.add_widget(bottomGridAnchorLayout)
 
 
         # add buttons into topGridSourceLayout 
         for i in range(36):
-            wimg = Image(source='assets/png/box_empty.png')
+            wimg = TouchableBlock()
             self.topGridSourceLayout.add_widget(wimg)
         # add buttons into topGridTargetLayout 
         for i in range(36):
-            wimg = Image(source='assets/png/box_empty.png')
+            wimg = TouchableBlock()
             self.topGridTargetLayout.add_widget(wimg)
 
         # add buttons into bottomGridLayout 
-        for i in range(6):
-            wimg = Image(source='assets/png/box_empty.png')
-            self.bottomGridLayout.add_widget(wimg)
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathTriangleGreen)
+        self.bottomGridLayout.add_widget(wimg)
 
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathTriangleBlue)
+        self.bottomGridLayout.add_widget(wimg)
 
-        pyramid = Image(source='assets/png/pyramid_orange.png', pos_hint=(1,1))
-        wimg.add_widget(pyramid)
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathBoxRed)
+        self.bottomGridLayout.add_widget(wimg)
 
-        # create a scroll view, with a size < size of the grid
-        # root = ScrollView(size_hint=(None, None), size=(500, 320),
-        #         pos_hint={'center_x': .5, 'center_y': .5}, do_scroll_x=True)
-        # root.add_widget(layout)
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathPyramidOrange)
+        self.bottomGridLayout.add_widget(wimg)
+
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathBoxGreen)
+        self.bottomGridLayout.add_widget(wimg)
+
 
         return self.mainLayout
 
