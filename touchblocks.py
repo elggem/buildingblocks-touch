@@ -19,6 +19,9 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle, Point, GraphicException, Line
 from kivy.core.window import Window
+
+from kivy.clock import Clock 
+
 from random import random
 from math import sqrt
 
@@ -32,6 +35,7 @@ pathTriangleGreen = assetPrefix+'triangle_green.png'
 
 # global variables for control
 selectedBlock = None
+compareTargetTrigger = None
 
 class TouchableBlock(RelativeLayout):
     def __init__(self, source=pathBoxEmpty, **kwargs):
@@ -60,8 +64,10 @@ class TouchableBlock(RelativeLayout):
             if self.displayedBlock is None and selectedBlock is not None:
               self.displayBlock(selectedBlock)
               selectedBlock = None
-            return True
 
+            if compareTargetTrigger:
+                compareTargetTrigger()
+            return True
         return False
 
     # def on_touch_move(self, touch):
@@ -90,6 +96,27 @@ class TouchBlocksApp(App):
         self.topGridTargetLayout.height = Window.height/2
         self.topGridTargetLayout.width = self.topGridTargetLayout.height        
         return True
+
+    def setTargetPattern(self, pattern="default"):
+        if pattern == "default":
+            self.sourceGridTouchableArray[2].displayBlock(pathPyramidOrange)
+            self.sourceGridTouchableArray[8].displayBlock(pathBoxGreen)
+            self.sourceGridTouchableArray[14].displayBlock(pathBoxRed)
+            self.sourceGridTouchableArray[20].displayBlock(pathBoxGreen)
+            self.sourceGridTouchableArray[26].displayBlock(pathBoxRed)
+            self.sourceGridTouchableArray[27].displayBlock(pathTriangleGreen)
+            self.sourceGridTouchableArray[33].displayBlock(pathTriangleBlue)
+
+    def compareTargetPatterns(self, evt):
+        theyAreEqual = True
+        for i,sourceTouchable in enumerate(self.sourceGridTouchableArray):
+            targetTouchable = self.targetGridTouchableArray[i]
+            if sourceTouchable.displayedBlock != targetTouchable.displayedBlock:
+                theyAreEqual = False
+
+        if theyAreEqual:
+            print("TARGET PATTERN")
+        return theyAreEqual
 
     def build(self):
 
@@ -130,13 +157,18 @@ class TouchBlocksApp(App):
         self.mainLayout.add_widget(bottomGridAnchorLayout)
 
 
-        # add buttons into topGridSourceLayout 
+        # add buttons into topGridSourceLayout
+        self.sourceGridTouchableArray = []
+        self.targetGridTouchableArray = []
+
         for i in range(36):
             wimg = TouchableBlock()
+            self.sourceGridTouchableArray.append(wimg)
             self.topGridSourceLayout.add_widget(wimg)
         # add buttons into topGridTargetLayout 
         for i in range(36):
             wimg = TouchableBlock()
+            self.targetGridTouchableArray.append(wimg)
             self.topGridTargetLayout.add_widget(wimg)
 
         # add buttons into bottomGridLayout 
@@ -159,6 +191,11 @@ class TouchBlocksApp(App):
         wimg = TouchableBlock()
         wimg.displayBlock(pathBoxGreen)
         self.bottomGridLayout.add_widget(wimg)
+
+        # show target pattern
+        self.setTargetPattern(pattern="default")
+        global compareTargetTrigger
+        compareTargetTrigger = Clock.create_trigger(self.compareTargetPatterns)        
 
         return self.mainLayout
 
