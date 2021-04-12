@@ -30,25 +30,43 @@ pathPyramidOrange = assetPrefix+'pyramid_orange.png'
 pathTriangleBlue = assetPrefix+'triangle_blue.png'
 pathTriangleGreen = assetPrefix+'triangle_green.png'
 
+# global variables for control
+selectedBlock = None
+
 class TouchableBlock(RelativeLayout):
     def __init__(self, source=pathBoxEmpty, **kwargs):
         super(TouchableBlock, self).__init__(**kwargs)
-
         gridImage = Image(source=source)
         self.add_widget(gridImage)
+
+        self.displayedBlock = None
 
     def displayBlock(self, source):
         img = Image(source=source)
         self.add_widget(img)
-        # self.source = source
+        self.displayedBlock = source
 
     def on_touch_down(self, touch):
-        print("touch")
-        return True
+        if self.collide_point(*touch.pos):
+          return True
+        return False
 
-    def on_touch_move(self, touch):
-        print("moving")
-        return True
+    def on_touch_up(self, touch):
+        global selectedBlock
+        if self.collide_point(*touch.pos):
+            if self.displayedBlock is not None:
+              selectedBlock = self.displayedBlock
+
+            if self.displayedBlock is None and selectedBlock is not None:
+              self.displayBlock(selectedBlock)
+              selectedBlock = None
+            return True
+
+        return False
+
+    # def on_touch_move(self, touch):
+    #     print("moving")
+    #     return True
 
 
 
@@ -142,10 +160,7 @@ class TouchBlocksApp(App):
         wimg.displayBlock(pathBoxGreen)
         self.bottomGridLayout.add_widget(wimg)
 
-
         return self.mainLayout
-
-
 
     def on_pause(self):
         return True
