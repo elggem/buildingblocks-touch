@@ -76,11 +76,7 @@ class TouchableBlock(RelativeLayout):
 
     def on_touch_up(self, touch):
         global dragAndDropWidget, selectedBlock
-        if self.collide_point(*touch.pos):
-            if dragAndDropWidget is not None:
-                Window.remove_widget(dragAndDropWidget)
-                dragAndDropWidget = None
-            
+        if self.collide_point(*touch.pos):            
             if selectedBlock is not None and self.immutable is False:
               self.displayBlock(selectedBlock)
               selectedBlock = None
@@ -98,15 +94,21 @@ class TouchableBlock(RelativeLayout):
 
     def on_touch_move(self, touch):
         global dragAndDropWidget, selectedBlock
-        if dragAndDropWidget is None and selectedBlock is not None:
-            dragAndDropWidget = Image(source=selectedBlock, size=(60,60), size_hint=(None,None))
-            Window.add_widget(dragAndDropWidget)
+        if self.collide_point(*touch.pos):
+            if dragAndDropWidget is None and selectedBlock is not None and self.pickable is True:
+                dragAndDropWidget = Image(source=selectedBlock, size=(60,60), size_hint=(None,None))
+                Window.add_widget(dragAndDropWidget)
 
-        if dragAndDropWidget is not None:
-            dragAndDropWidget.pos[0] = touch.pos[0]-30
-            dragAndDropWidget.pos[1] = touch.pos[1]-30
+            if dragAndDropWidget is not None:
+                dragAndDropWidget.pos[0] = touch.pos[0]-30
+                dragAndDropWidget.pos[1] = touch.pos[1]-30
 
-        return True
+            return True
+        else:
+            if dragAndDropWidget is not None:
+                dragAndDropWidget.pos[0] = touch.pos[0]-30
+                dragAndDropWidget.pos[1] = touch.pos[1]-30
+            return False
 
 
 
