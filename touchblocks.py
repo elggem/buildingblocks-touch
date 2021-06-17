@@ -27,11 +27,13 @@ from math import sqrt
 
 assetPrefix = "assets/png/"
 pathBoxEmpty = assetPrefix+'box_empty.png'
-pathBoxGreen = assetPrefix+'box_green.png'
+pathBoxBlue = assetPrefix+'box_blue.png'
 pathBoxRed = assetPrefix+'box_red.png'
 pathPyramidOrange = assetPrefix+'pyramid_orange.png'
-pathTriangleBlue = assetPrefix+'triangle_blue.png'
-pathTriangleGreen = assetPrefix+'triangle_green.png'
+pathTriangleGreenLeft = assetPrefix+'triangle_green_left.png'
+pathTriangleGreenRight = assetPrefix+'triangle_green_right.png'
+pathTriangleYellowLeft = assetPrefix+'triangle_yellow_left.png'
+pathTriangleYellowRight = assetPrefix+'triangle_yellow_right.png'
 
 # global variables for control
 selectedBlock = None
@@ -100,12 +102,14 @@ class TouchBlocksApp(App):
     def setTargetPattern(self, pattern="default"):
         if pattern == "default":
             self.sourceGridTouchableArray[2].displayBlock(pathPyramidOrange)
-            self.sourceGridTouchableArray[8].displayBlock(pathBoxGreen)
+            self.sourceGridTouchableArray[8].displayBlock(pathBoxBlue)
             self.sourceGridTouchableArray[14].displayBlock(pathBoxRed)
-            self.sourceGridTouchableArray[20].displayBlock(pathBoxGreen)
+            self.sourceGridTouchableArray[20].displayBlock(pathBoxBlue)
             self.sourceGridTouchableArray[26].displayBlock(pathBoxRed)
-            self.sourceGridTouchableArray[27].displayBlock(pathTriangleGreen)
-            self.sourceGridTouchableArray[33].displayBlock(pathTriangleBlue)
+            self.sourceGridTouchableArray[27].displayBlock(pathTriangleGreenLeft)
+            self.sourceGridTouchableArray[33].displayBlock(pathTriangleYellowRight)
+            self.sourceGridTouchableArray[25].displayBlock(pathTriangleGreenRight)
+            self.sourceGridTouchableArray[31].displayBlock(pathTriangleYellowLeft)
 
     def compareTargetPatterns(self, evt):
         theyAreEqual = True
@@ -125,7 +129,7 @@ class TouchBlocksApp(App):
         self.mainLayout = FloatLayout()
 
         self.topGridsLayout = GridLayout(cols=2, size_hint=(None,None))
-        self.bottomGridLayout = GridLayout(cols=5, size_hint=(None,None))
+        self.bottomGridLayout = GridLayout(cols=7, size_hint=(None,None))
 
         self.topGridSourceLayout = GridLayout(cols=6, rows=6, size_hint=(None,None))
         self.topGridTargetLayout = GridLayout(cols=6, rows=6, size_hint=(None,None))
@@ -173,11 +177,19 @@ class TouchBlocksApp(App):
 
         # add buttons into bottomGridLayout 
         wimg = TouchableBlock()
-        wimg.displayBlock(pathTriangleGreen)
+        wimg.displayBlock(pathTriangleGreenLeft)
         self.bottomGridLayout.add_widget(wimg)
 
         wimg = TouchableBlock()
-        wimg.displayBlock(pathTriangleBlue)
+        wimg.displayBlock(pathTriangleGreenRight)
+        self.bottomGridLayout.add_widget(wimg)
+
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathTriangleYellowLeft)
+        self.bottomGridLayout.add_widget(wimg)
+
+        wimg = TouchableBlock()
+        wimg.displayBlock(pathTriangleYellowRight)
         self.bottomGridLayout.add_widget(wimg)
 
         wimg = TouchableBlock()
@@ -189,7 +201,7 @@ class TouchBlocksApp(App):
         self.bottomGridLayout.add_widget(wimg)
 
         wimg = TouchableBlock()
-        wimg.displayBlock(pathBoxGreen)
+        wimg.displayBlock(pathBoxBlue)
         self.bottomGridLayout.add_widget(wimg)
 
         # show target pattern
