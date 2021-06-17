@@ -39,6 +39,7 @@ pathTriangleYellowRight = assetPrefix+'triangle_yellow_right.png'
 # global variables for control
 selectedBlock = None
 compareTargetTrigger = None
+dragAndDropWidget = None
 
 class TouchableBlock(RelativeLayout):
     def __init__(self, source=pathBoxEmpty, **kwargs):
@@ -66,14 +67,20 @@ class TouchableBlock(RelativeLayout):
         self.displayedWidget = None
 
     def on_touch_down(self, touch):
+        global selectedBlock
         if self.collide_point(*touch.pos):
+          if self.displayedBlock is not None and self.pickable is True:
+            selectedBlock = self.displayedBlock
           return True
         return False
 
     def on_touch_up(self, touch):
-        global selectedBlock
+        global dragAndDropWidget, selectedBlock
         if self.collide_point(*touch.pos):
-
+            if dragAndDropWidget is not None:
+                Window.remove_widget(dragAndDropWidget)
+                dragAndDropWidget = None
+            
             if selectedBlock is not None and self.immutable is False:
               self.displayBlock(selectedBlock)
               selectedBlock = None
@@ -89,9 +96,17 @@ class TouchableBlock(RelativeLayout):
             return True
         return False
 
-    # def on_touch_move(self, touch):
-    #     print("moving")
-    #     return True
+    def on_touch_move(self, touch):
+        global dragAndDropWidget, selectedBlock
+        if dragAndDropWidget is None and selectedBlock is not None:
+            dragAndDropWidget = Image(source=selectedBlock, size=(60,60), size_hint=(None,None))
+            Window.add_widget(dragAndDropWidget)
+
+        if dragAndDropWidget is not None:
+            dragAndDropWidget.pos[0] = touch.pos[0]-30
+            dragAndDropWidget.pos[1] = touch.pos[1]-30
+
+        return True
 
 
 
@@ -104,6 +119,7 @@ class TouchBlocksApp(App):
         # Window init
         Window.clearcolor = (1, 1, 1, 1)
         Window.bind(on_resize=self.on_resize)
+        Window.bind(on_touch_up=self.on_touch_up)
 
     def on_resize(self, window, width, height):
         self.topGridsLayout.width = Window.width
@@ -115,6 +131,13 @@ class TouchBlocksApp(App):
         self.topGridTargetLayout.height = Window.height/2
         self.topGridTargetLayout.width = self.topGridTargetLayout.height        
         return True
+
+    def on_touch_up(self, touch, window):
+        global dragAndDropWidget
+        if dragAndDropWidget is not None:
+            Window.remove_widget(dragAndDropWidget)
+            dragAndDropWidget = None
+        return False
 
     def setTargetPattern(self, pattern="default"):
         if pattern == "default":
@@ -145,6 +168,9 @@ class TouchBlocksApp(App):
     def getLabelWidget(self, text):
         return Label(text='[font=assets/fonts/computermodern-italic.ttf][color=000000]'+text+'[/color][/font]', markup=True)
 
+    def getHeaderLabelWidget(self, text):
+        return Label(text='[font=assets/fonts/computermodern-normal.ttf][color=000000]'+text+'[/color][/font]', markup=True)
+
     def build(self):
 
         # return TouchBlocks()
@@ -152,8 +178,8 @@ class TouchBlocksApp(App):
         self.mainLayout = FloatLayout()
 
         self.topGridsLayout = GridLayout(cols=2, size_hint=(None,None))
-        self.bottomGridLayout = GridLayout(cols=7, rows=2, size_hint=(None,None), padding=[-40,40])
 
+        self.bottomGridLayout = GridLayout(cols=7, rows=2, size_hint=(None,None), padding=[-40,40])
         self.topGridSourceLayout = GridLayout(cols=7, rows=7, size_hint=(None,None))
         self.topGridTargetLayout = GridLayout(cols=7, rows=7, size_hint=(None,None))
 
