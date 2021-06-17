@@ -15,6 +15,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.stencilview import StencilView
 from kivy.uix.button import Button
 from kivy.uix.image import Image
+from kivy.uix.label import Label
 
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle, Point, GraphicException, Line
@@ -45,12 +46,24 @@ class TouchableBlock(RelativeLayout):
         gridImage = Image(source=source)
         self.add_widget(gridImage)
 
+        self.pickable = False
+        self.immutable = False
+
         self.displayedBlock = None
+        self.displayedWidget = None
 
     def displayBlock(self, source):
+        self.clearBlock()
         img = Image(source=source)
         self.add_widget(img)
         self.displayedBlock = source
+        self.displayedWidget = img
+
+    def clearBlock(self):
+        if self.displayedWidget is not None:
+            self.remove_widget(self.displayedWidget)
+        self.displayedBlock = None
+        self.displayedWidget = None
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
@@ -60,12 +73,16 @@ class TouchableBlock(RelativeLayout):
     def on_touch_up(self, touch):
         global selectedBlock
         if self.collide_point(*touch.pos):
-            if self.displayedBlock is not None:
-              selectedBlock = self.displayedBlock
 
-            if self.displayedBlock is None and selectedBlock is not None:
+            if selectedBlock is not None and self.immutable is False:
               self.displayBlock(selectedBlock)
               selectedBlock = None
+
+            elif selectedBlock is None and self.immutable is False:
+              self.clearBlock()
+            
+            elif self.displayedBlock is not None and self.pickable is True:
+              selectedBlock = self.displayedBlock
 
             if compareTargetTrigger:
                 compareTargetTrigger()
@@ -119,8 +136,14 @@ class TouchBlocksApp(App):
                 theyAreEqual = False
 
         if theyAreEqual:
-            print("TARGET PATTERN")
+            print("TARGET PATTERN -- LOCKING ALL")
+            for blk in self.targetGridTouchableArray:
+                blk.immutable = True
+
         return theyAreEqual
+
+    def getLabelWidget(self, text):
+        return Label(text='[font=assets/fonts/computermodern-italic.ttf][color=000000]'+text+'[/color][/font]', markup=True)
 
     def build(self):
 
@@ -129,10 +152,10 @@ class TouchBlocksApp(App):
         self.mainLayout = FloatLayout()
 
         self.topGridsLayout = GridLayout(cols=2, size_hint=(None,None))
-        self.bottomGridLayout = GridLayout(cols=7, size_hint=(None,None))
+        self.bottomGridLayout = GridLayout(cols=7, rows=2, size_hint=(None,None), padding=[-40,40])
 
-        self.topGridSourceLayout = GridLayout(cols=6, rows=6, size_hint=(None,None))
-        self.topGridTargetLayout = GridLayout(cols=6, rows=6, size_hint=(None,None))
+        self.topGridSourceLayout = GridLayout(cols=7, rows=7, size_hint=(None,None))
+        self.topGridTargetLayout = GridLayout(cols=7, rows=7, size_hint=(None,None))
 
         self.topGridsLayout.width = Window.width
         self.topGridsLayout.height = Window.height/3*2
@@ -161,48 +184,68 @@ class TouchBlocksApp(App):
         self.mainLayout.add_widget(bottomGridAnchorLayout)
 
 
-        # add buttons into topGridSourceLayout
         self.sourceGridTouchableArray = []
         self.targetGridTouchableArray = []
 
-        for i in range(36):
-            wimg = TouchableBlock()
-            self.sourceGridTouchableArray.append(wimg)
-            self.topGridSourceLayout.add_widget(wimg)
+        self.topGridSourceLayout.add_widget(self.getLabelWidget(''))
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('a'))
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('b'))
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('c'))
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('d'))
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('e'))
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('f'))
+
+        # add buttons into topGridSourceLayout 
+        for i in range(6):
+            self.topGridSourceLayout.add_widget(self.getLabelWidget(str(i+1)))
+            for _ in range(6):
+                wimg = TouchableBlock()
+                wimg.immutable = True
+                self.sourceGridTouchableArray.append(wimg)
+                self.topGridSourceLayout.add_widget(wimg)
+
+
+        self.topGridTargetLayout.add_widget(self.getLabelWidget(''))
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('a\''))
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('b\''))
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('c\''))
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('d\''))
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('e\''))
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('f\''))
+
         # add buttons into topGridTargetLayout 
-        for i in range(36):
+        for i in range(6):
+            self.topGridTargetLayout.add_widget(self.getLabelWidget(str(i+1)+'\''))
+            for _ in range(6):
+                wimg = TouchableBlock()
+                self.targetGridTouchableArray.append(wimg)
+                self.topGridTargetLayout.add_widget(wimg)
+
+
+
+        # add buttons into bottomGridLayout
+        self.bottomGridLayout.add_widget(self.getLabelWidget('t'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget('u'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget('v'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget('w'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget('x'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget('y'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget('z'))
+
+        touchableBlocks = [pathTriangleGreenLeft, 
+                           pathTriangleGreenRight, 
+                           pathTriangleYellowLeft, 
+                           pathTriangleYellowRight, 
+                           pathBoxRed, 
+                           pathPyramidOrange, 
+                           pathBoxBlue]
+
+        for touchableBlock in touchableBlocks:
             wimg = TouchableBlock()
-            self.targetGridTouchableArray.append(wimg)
-            self.topGridTargetLayout.add_widget(wimg)
-
-        # add buttons into bottomGridLayout 
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathTriangleGreenLeft)
-        self.bottomGridLayout.add_widget(wimg)
-
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathTriangleGreenRight)
-        self.bottomGridLayout.add_widget(wimg)
-
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathTriangleYellowLeft)
-        self.bottomGridLayout.add_widget(wimg)
-
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathTriangleYellowRight)
-        self.bottomGridLayout.add_widget(wimg)
-
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathBoxRed)
-        self.bottomGridLayout.add_widget(wimg)
-
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathPyramidOrange)
-        self.bottomGridLayout.add_widget(wimg)
-
-        wimg = TouchableBlock()
-        wimg.displayBlock(pathBoxBlue)
-        self.bottomGridLayout.add_widget(wimg)
+            wimg.displayBlock(touchableBlock)
+            wimg.immutable = True
+            wimg.pickable = True
+            self.bottomGridLayout.add_widget(wimg)
 
         # show target pattern
         self.setTargetPattern(pattern="default")
