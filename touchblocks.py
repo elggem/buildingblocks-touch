@@ -174,21 +174,20 @@ class TouchBlocksApp(App):
         return Label(text='[font=assets/fonts/computermodern-normal.ttf][color=000000]'+text+'[/color][/font]', markup=True)
 
     def build(self):
-
         # return TouchBlocks()
         # create a default grid layout with custom width/height
         self.mainLayout = FloatLayout()
 
         self.topGridsLayout = GridLayout(cols=2, size_hint=(None,None))
-
-        self.bottomGridLayout = GridLayout(cols=7, rows=2, size_hint=(None,None), padding=[-40,40])
-        self.topGridSourceLayout = GridLayout(cols=7, rows=7, size_hint=(None,None))
-        self.topGridTargetLayout = GridLayout(cols=7, rows=7, size_hint=(None,None))
+        self.bottomGridLayout = GridLayout(cols=8, rows=3, size_hint=(None,None), padding=[-40,40])
 
         self.topGridsLayout.width = Window.width
         self.topGridsLayout.height = Window.height/3*2
         self.bottomGridLayout.width = Window.height/2 * 1.5 # bottom buttons scaling factor
         self.bottomGridLayout.height = Window.height/3
+
+        self.topGridSourceLayout = GridLayout(cols=8, rows=8, size_hint=(None,None))
+        self.topGridTargetLayout = GridLayout(cols=8, rows=8, size_hint=(None,None))
 
         self.topGridSourceLayout.height = Window.height/2
         self.topGridTargetLayout.height = Window.height/2
@@ -211,9 +210,12 @@ class TouchBlocksApp(App):
         self.mainLayout.add_widget(topGridsAnchorLayout)
         self.mainLayout.add_widget(bottomGridAnchorLayout)
 
-
         self.sourceGridTouchableArray = []
         self.targetGridTouchableArray = []
+
+        self.topGridSourceLayout.add_widget(self.getLabelWidget('A.'))
+        for _ in range(7):
+            self.topGridSourceLayout.add_widget(self.getLabelWidget(''))
 
         self.topGridSourceLayout.add_widget(self.getLabelWidget(''))
         self.topGridSourceLayout.add_widget(self.getLabelWidget('a'))
@@ -225,6 +227,7 @@ class TouchBlocksApp(App):
 
         # add buttons into topGridSourceLayout 
         for i in range(6):
+            self.topGridSourceLayout.add_widget(self.getLabelWidget(''))
             self.topGridSourceLayout.add_widget(self.getLabelWidget(str(i+1)))
             for _ in range(6):
                 wimg = TouchableBlock()
@@ -232,6 +235,10 @@ class TouchBlocksApp(App):
                 self.sourceGridTouchableArray.append(wimg)
                 self.topGridSourceLayout.add_widget(wimg)
 
+
+        self.topGridTargetLayout.add_widget(self.getLabelWidget('B.'))
+        for _ in range(7):
+            self.topGridTargetLayout.add_widget(self.getLabelWidget(''))
 
         self.topGridTargetLayout.add_widget(self.getLabelWidget(''))
         self.topGridTargetLayout.add_widget(self.getLabelWidget('a\''))
@@ -243,6 +250,7 @@ class TouchBlocksApp(App):
 
         # add buttons into topGridTargetLayout 
         for i in range(6):
+            self.topGridTargetLayout.add_widget(self.getLabelWidget(''))
             self.topGridTargetLayout.add_widget(self.getLabelWidget(str(i+1)+'\''))
             for _ in range(6):
                 wimg = TouchableBlock()
@@ -252,6 +260,11 @@ class TouchBlocksApp(App):
 
 
         # add buttons into bottomGridLayout
+        self.bottomGridLayout.add_widget(self.getLabelWidget('C.'))
+        for _ in range(7):
+            self.bottomGridLayout.add_widget(self.getLabelWidget(''))
+
+        self.bottomGridLayout.add_widget(self.getLabelWidget(''))
         self.bottomGridLayout.add_widget(self.getLabelWidget('t'))
         self.bottomGridLayout.add_widget(self.getLabelWidget('u'))
         self.bottomGridLayout.add_widget(self.getLabelWidget('v'))
@@ -259,6 +272,7 @@ class TouchBlocksApp(App):
         self.bottomGridLayout.add_widget(self.getLabelWidget('x'))
         self.bottomGridLayout.add_widget(self.getLabelWidget('y'))
         self.bottomGridLayout.add_widget(self.getLabelWidget('z'))
+        self.bottomGridLayout.add_widget(self.getLabelWidget(''))
 
         touchableBlocks = [pathTriangleGreenLeft, 
                            pathTriangleGreenRight, 
