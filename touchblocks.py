@@ -25,6 +25,7 @@ from kivy.clock import Clock
 
 from random import random
 from math import sqrt
+import sys
 
 assetPrefix = "assets/png/"
 pathBoxEmpty = assetPrefix+'box_empty.png'
@@ -123,6 +124,13 @@ class TouchBlocksApp(App):
         Window.bind(on_resize=self.on_resize)
         Window.bind(on_touch_up=self.on_touch_up)
 
+        # window cursor
+        if 'nocursor' in sys.argv:
+            print("no Cursor!")
+            Window.show_cursor = False
+        else:
+            Window.show_cursor = True
+
     def on_resize(self, window, width, height):
         self.topGridsLayout.width = Window.width
         self.topGridsLayout.height = Window.height/3*2
@@ -174,7 +182,6 @@ class TouchBlocksApp(App):
         return Label(text='[size='+str(size)+'][font=assets/fonts/computermodern-normal.ttf][color=000000]'+text+'[/color][/font][/size]', markup=True)
 
     def build(self):
-        Window.show_cursor = False
         # return TouchBlocks()
         # create a default grid layout with custom width/height
         self.mainLayout = FloatLayout()
@@ -183,7 +190,7 @@ class TouchBlocksApp(App):
         self.bottomGridLayout = GridLayout(cols=8, rows=3, size_hint=(None,None), padding=[-40,40])
 
         self.topGridsLayout.width = Window.width
-        self.topGridsLayout.height = Window.height/3*2
+        self.topGridsLayout.height = Window.height/3 * 2
         self.bottomGridLayout.width = Window.height/2 * 1.5 # bottom buttons scaling factor
         self.bottomGridLayout.height = Window.height/3
 
