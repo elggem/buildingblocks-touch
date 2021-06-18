@@ -96,18 +96,18 @@ class TouchableBlock(RelativeLayout):
         global dragAndDropWidget, selectedBlock
         if self.collide_point(*touch.pos):
             if dragAndDropWidget is None and selectedBlock is not None and self.pickable is True:
-                dragAndDropWidget = Image(source=selectedBlock, size=(60,60), size_hint=(None,None))
+                dragAndDropWidget = Image(source=selectedBlock, size=(80,80), size_hint=(None,None))
                 Window.add_widget(dragAndDropWidget)
 
             if dragAndDropWidget is not None:
-                dragAndDropWidget.pos[0] = touch.pos[0]-30
-                dragAndDropWidget.pos[1] = touch.pos[1]-30
+                dragAndDropWidget.pos[0] = touch.pos[0]-40
+                dragAndDropWidget.pos[1] = touch.pos[1]-40
 
             return True
         else:
             if dragAndDropWidget is not None:
-                dragAndDropWidget.pos[0] = touch.pos[0]-30
-                dragAndDropWidget.pos[1] = touch.pos[1]-30
+                dragAndDropWidget.pos[0] = touch.pos[0]-40
+                dragAndDropWidget.pos[1] = touch.pos[1]-40
             return False
 
 
@@ -128,9 +128,9 @@ class TouchBlocksApp(App):
         self.topGridsLayout.height = Window.height/3*2
         self.bottomGridLayout.width = Window.height/2 * 1.5 # bottom buttons scaling factor
         self.bottomGridLayout.height = Window.height/3
-        self.topGridSourceLayout.height = Window.height/2
+        self.topGridSourceLayout.height = Window.height/1.5
+        self.topGridTargetLayout.height = Window.height/1.5
         self.topGridSourceLayout.width = self.topGridSourceLayout.height
-        self.topGridTargetLayout.height = Window.height/2
         self.topGridTargetLayout.width = self.topGridTargetLayout.height        
         return True
 
@@ -167,11 +167,11 @@ class TouchBlocksApp(App):
 
         return theyAreEqual
 
-    def getLabelWidget(self, text):
-        return Label(text='[font=assets/fonts/computermodern-italic.ttf][color=000000]'+text+'[/color][/font]', markup=True)
+    def getLabelWidget(self, text, size=28):
+        return Label(text='[size='+str(size)+'][font=assets/fonts/computermodern-italic.ttf][color=000000]'+text+'[/color][/font][/size]', markup=True)
 
-    def getHeaderLabelWidget(self, text):
-        return Label(text='[font=assets/fonts/computermodern-normal.ttf][color=000000]'+text+'[/color][/font]', markup=True)
+    def getHeaderLabelWidget(self, text, size=36):
+        return Label(text='[size='+str(size)+'][font=assets/fonts/computermodern-normal.ttf][color=000000]'+text+'[/color][/font][/size]', markup=True)
 
     def build(self):
         # return TouchBlocks()
@@ -189,8 +189,8 @@ class TouchBlocksApp(App):
         self.topGridSourceLayout = GridLayout(cols=8, rows=8, size_hint=(None,None))
         self.topGridTargetLayout = GridLayout(cols=8, rows=8, size_hint=(None,None))
 
-        self.topGridSourceLayout.height = Window.height/2
-        self.topGridTargetLayout.height = Window.height/2
+        self.topGridSourceLayout.height = Window.height/1.5
+        self.topGridTargetLayout.height = Window.height/1.5
         self.topGridSourceLayout.width = self.topGridSourceLayout.height
         self.topGridTargetLayout.width = self.topGridTargetLayout.height   
 
