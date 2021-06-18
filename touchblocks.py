@@ -16,7 +16,7 @@ from kivy.uix.stencilview import StencilView
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
-
+from kivy.config import Config
 from kivy.uix.label import Label
 from kivy.graphics import Color, Rectangle, Point, GraphicException, Line
 from kivy.core.window import Window
@@ -40,6 +40,9 @@ pathTriangleYellowRight = assetPrefix+'triangle_yellow_right.png'
 selectedBlock = None
 compareTargetTrigger = None
 dragAndDropWidget = None
+
+Config.set('graphics','show_cursor','0')
+Config.write()
 
 class TouchableBlock(RelativeLayout):
     def __init__(self, source=pathBoxEmpty, **kwargs):
