@@ -174,6 +174,7 @@ class TouchBlocksApp(App):
         return Label(text='[size='+str(size)+'][font=assets/fonts/computermodern-normal.ttf][color=000000]'+text+'[/color][/font][/size]', markup=True)
 
     def build(self):
+        Window.show_cursor = False
         # return TouchBlocks()
         # create a default grid layout with custom width/height
         self.mainLayout = FloatLayout()
